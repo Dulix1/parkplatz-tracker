@@ -251,7 +251,7 @@
 
   // Namen, die automatisch zu einer festen Uhrzeit abgemeldet werden
   // (Groß-/Kleinschreibung egal). Gilt nur, wenn beim Belegen keine
-  // eigene "Belegt bis"-Zeit angegeben wurde.
+  // eigene "Belegt bis"-Zeit angegeben wurde. Wird nicht angezeigt.
   const AUTO_ABMELDEN = { "Chris": "18:00" };
 
   // Firebase-Zugangsdaten hier einfügen (siehe README).
@@ -398,11 +398,10 @@
           <div class="tile-body"><span class="empty">Verfügbar</span></div>
           <button class="btn btn-occupy" data-occupy="${esc(spot)}">Jetzt belegen</button>`;
       } else {
-        const until = effectiveUntil(info);
-        const hasUntil = !!until;
+        const hasUntil = !!info.until;
         tile.className = 'tile ' + (hasUntil ? 'until' : 'taken');
         const untilHtml = hasUntil
-          ? `<div>bis <span class="until-time">${esc(until)} Uhr</span></div>` : '';
+          ? `<div>bis <span class="until-time">${esc(info.until)} Uhr</span></div>` : '';
         tile.innerHTML = `
           <div class="tile-head">
             <span class="tile-name">${esc(spot)}</span>
