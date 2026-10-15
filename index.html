@@ -249,6 +249,11 @@
   // Parkplätze – einfach Namen ergänzen oder entfernen:
   const PARKPLAETZE = ["IN-KA40", "IN-KA20", "Julia", "Heidi", "Alex"];
 
+  // Namen, die automatisch zu einer festen Uhrzeit abgemeldet werden
+  // (Groß-/Kleinschreibung egal). Gilt nur, wenn beim Belegen keine
+  // eigene "Belegt bis"-Zeit angegeben wurde. Wird nicht angezeigt.
+  const AUTO_ABMELDEN = { "Chris": "18:00" };
+
   // Firebase-Zugangsdaten hier einfügen (siehe README).
   // Solange leer, läuft die App im lokalen Testmodus.
   const FIREBASE_CONFIG = {
@@ -318,10 +323,20 @@
     persist(state);
   }
 
+  // "Belegt bis"-Uhrzeit: eigene Angabe oder feste Zeit aus AUTO_ABMELDEN (oder null).
+  function effectiveUntil(info) {
+    if (!info) return null;
+    if (info.until) return info.until;
+    const name = String(info.name || '').trim().toLowerCase();
+    const key = Object.keys(AUTO_ABMELDEN).find(n => n.trim().toLowerCase() === name);
+    return key ? AUTO_ABMELDEN[key] : null;
+  }
+
   // Zeitpunkt, zu dem ein "belegt bis"-Platz abläuft (oder null).
   function expiryDate(info) {
-    if (!info || !info.until) return null;
-    const parts = String(info.until).split(':');
+    const until = effectiveUntil(info);
+    if (!until) return null;
+    const parts = String(until).split(':');
     const h = parseInt(parts[0], 10), m = parseInt(parts[1], 10);
     if (isNaN(h) || isNaN(m)) return null;
     const ref = info.since ? new Date(info.since) : new Date();
